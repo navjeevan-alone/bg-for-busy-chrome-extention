@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "BG for Busy",
+  "version": "1.0",
+  "description": "BG for Busy",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "permissions": [
+    "tts",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://bhagavad-gita3.p.rapidapi.com/*"
+  ]
+}

@@ -1,0 +1,671 @@
+:root {
+  --primary-color: #ff7722;
+  --accent-color: #b65417;
+  --primary-color: #f74c06;
+  --accent-color: #f9bc2c;
+  --text-color: #2c3e50;
+  --bg-color: #fff8f3;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+html body {
+  width: 350px;
+  height: 520px;
+  margin: 25px;
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  color: var(--text-color);
+  position: relative;
+  background: var(--bg-color);
+}
+
+html body::before {
+  content: "";
+  background-image: url("../img/mandala-bg.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.15;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0 auto;
+  padding: 20px;
+  /* background: #fff; */
+  background-position: center center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  border-radius: 15px;
+  /* box-shadow: 0 8px 32px var(--shadow-color); */
+  backdrop-filter:opacity(0.1);
+  overflow: hidden;
+}
+/*test  */
+
+#heading {
+  font-family: "Tiro Devanagari Hindi", serif;
+  color: var(--text-color);
+  font-size: 2rem;
+  /* margin-bottom: 1.5rem; */
+  text-shadow: 2px 2px 4px var(--shadow-color);
+}
+
+.button {
+  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--accent-color)
+  );
+  text-align: center;
+  border: none;
+  font-weight: 600;
+  outline: none;
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  height: 40px;
+  padding: 0 25px;
+  margin: 10px auto;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(239, 116, 1, 0.2);
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 116, 1, 0.3);
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.flex-item {
+  /* margin: 10px; */
+  justify-content: space-between;
+}
+
+#choose {
+  flex-direction: row;
+  display: flex;
+  /* gap: 15px; */
+  margin: 20px 0;
+  justify-content: space-around;
+}
+
+#choose div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+select,
+option {
+  width: 8rem;
+  height: 35px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: white;
+  color: var(--text-color);
+  border: 2px solid #e5e7eb;
+  padding: 0 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+}
+
+select:hover {
+  border-color: var(--primary-color);
+}
+
+select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(239, 116, 1, 0.1);
+  outline: none;
+}
+
+#result {
+  font-family: "Tiro Devanagari Hindi", serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  padding: 15px;
+  margin: 15px 0;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  border-left: 4px solid var(--primary-color);
+  transform: translateX(0);
+  opacity: 1;
+}
+
+#meaning {
+  font-size: 0.9rem;
+  color: #4a5568;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  margin: 15px 0;
+  transform: translateX(0);
+  opacity: 1;
+}
+
+#whichVerse {
+  font-weight: 500;
+  color: var(--primary-color);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 8px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transform: translateX(0);
+  opacity: 1;
+}
+
+#previousButton,
+#nextButton {
+  font-size: 0.9rem;
+  padding: 0 3rem;
+  margin: 0;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+/* Loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.loading {
+  animation: shimmer 1s linear infinite;
+  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+  background-size: 800px 104px;
+}
+
+.nav-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+/* Add these rules to your existing CSS */
+#result,
+#meaning,
+#whichVerse,
+#speakButton,
+.nav-buttons {
+  display: none;
+}
+
+#result.show,
+#meaning.show,
+#whichVerse.show,
+#speakButton.show,
+.nav-buttons.show {
+  display: block;
+  animation: slideInTop 0.5s ease forwards;
+}
+
+/* Keep nav-buttons flex when shown */
+.nav-buttons.show {
+  display: flex;
+}
+
+/* Add these animation keyframes to your existing CSS */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInTop {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Add these classes for directional animations */
+.slide-in-right {
+  animation: slideInRight 0.5s ease forwards !important;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.5s ease forwards !important;
+}
+
+/* Add overflow hidden to prevent content spillover during animation */
+#card {
+  overflow: hidden;
+}
+
+/* Add transition properties to elements */
+#result,
+#meaning,
+#whichVerse,
+#speakButton {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Add these styles to your existing CSS */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  cursor: pointer;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background: rgba(255, 119, 34, 0.1);
+}
+
+.about-content {
+  text-align: left;
+  padding: 10px;
+}
+
+.features {
+  margin: 20px 0;
+}
+
+.features h2 {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.features ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.features li {
+  margin: 10px 0;
+  padding-left: 25px;
+  position: relative;
+}
+
+.features li::before {
+  content: "•";
+  color: var(--primary-color);
+  position: absolute;
+  left: 10px;
+}
+
+.version-info {
+  margin-top: 30px;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Add info icon to popup.html */
+.info-icon {
+  position: static;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.about-card {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.back-button svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke: var(--primary-color);
+  padding-top: 4px;
+}
+
+.instagram-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary-color);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+  background: rgba(255, 119, 34, 0.1);
+}
+
+.instagram-link:hover {
+  background: rgba(255, 119, 34, 0.2);
+  transform: translateY(-2px);
+}
+
+.instagram-link svg {
+  width: 20px;
+  height: 20px;
+}
+
+.about-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.features {
+  flex-grow: 1;
+}
+
+.version-info {
+  margin-top: auto;
+  padding: 20px 0;
+}
+
+/* Add this with your other animations */
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Add this to your animations */
+.slide-out {
+    animation: slideOutToRight 0.3s ease-out forwards;
+}
+
+/* Add these styles */
+.verse-detail {
+  font-size: 0.9rem;
+  color: #4a5568;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  margin: 10px 0;
+  display: none;
+  text-align: left;
+}
+
+.verse-detail.show {
+  display: block;
+  animation: slideInTop 0.5s ease forwards;
+}
+
+/* Add section headings */
+.verse-detail::before {
+  content: attr(data-title);
+  display: block;
+  color: var(--primary-color);
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+.icon-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.icon-button:hover {
+  background: rgba(255, 119, 34, 0.1);
+}
+
+.icon-button.active svg {
+  fill: var(--primary-color);
+}
+
+.favorites-container {
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+}
+
+.favorites-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.favorite-item {
+  background: rgba(255, 119, 34, 0.1);
+  padding: 4px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.favorite-item:hover {
+  background: rgba(255, 119, 34, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Add these styles */
+.favorites-page {
+    padding: 15px;
+}
+
+.saved-verses-list {
+    margin-top: 20px;
+}
+
+.verse-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: slideInLeft 0.3s ease-out;
+}
+
+.verse-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.verse-number {
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.remove-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.remove-button:hover {
+    color: #ff4444;
+}
+
+.remove-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.verse-content {
+    text-align: left;
+}
+
+.sanskrit-text {
+    font-family: "Tiro Devanagari Hindi", serif;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.translation {
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+.no-favorites {
+    text-align: center;
+    color: #666;
+    margin-top: 30px;
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.bookmark-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--primary-color);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    display: none;
+}
+
+.bookmark-count.show {
+    display: block;
+}
+
+.top-icons {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 12px;
+  z-index: 1;
+}
+
+.saved-verses-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--primary-color);
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.saved-verses-button:hover {
+  transform: scale(1.1);
+}
+
+.saved-verses-button svg {
+  width: 100%;
+  height: 100%;
+}
