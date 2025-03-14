@@ -1,6 +1,8 @@
-# BG for Busy Extension
+# <img src="./icons/icon16.png" alt="BG for Busy Logo" width="50" style="padding-top:-10px; margin-right: 10px;"/> BG for Busy Extension
 ![Version](https://img.shields.io/badge/version-1.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+## Preview
+<img src="./img/preview.png" alt="BG for Busy Banner" width="100%"/>
 
 ## 🌟 Motivation
 
