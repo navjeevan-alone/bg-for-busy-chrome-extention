@@ -506,3 +506,6 @@ function updateFavoritesList() {
     window.location.href = 'favorites.html';
   };
 }
+
+// Show a random verse when the extension loads
+showRandomVerse();
