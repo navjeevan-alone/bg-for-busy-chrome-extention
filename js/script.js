@@ -53,6 +53,22 @@ async function loadGitaData() {
   }
 }
 
+const mergedVersesMap = {
+  '1': [[16, 18], [21, 22], [32, 35], [37, 38]],
+  '2': [[42, 43]],
+  '5': [[8, 9], [27, 28]],
+  '6': [[11, 12], [20, 23]],
+  '10': [[4, 5], [12, 13]],
+  '11': [[10, 11], [26, 27], [41, 42]],
+  '12': [[3, 4], [6, 7], [13, 14], [18, 19]],
+  '13': [[1, 2], [6, 7], [8, 12]],
+  '14': [[22, 25]],
+  '15': [[3, 4]],
+  '16': [[1, 3], [13, 15]],
+  '17': [[5, 6], [26, 27]],
+  '18': [[51, 53]]
+};
+
 /**
  * Gets specific verse data from the loaded JSON
  * @param {number|string} chapterNumber - Chapter number
@@ -64,15 +80,37 @@ async function getVerseData(chapterNumber, verseNumber) {
     const chapter = parseInt(chapterNumber);
     const verse = parseInt(verseNumber);
 
-    // Find the specific verse
-    const verseEntry = data.find(v => v.chapter === chapter && v.verse_start <= verse && v.verse_end >= verse);
+    let targetStart = verse;
+    let targetEnd = verse;
+    let isMerged = false;
+
+    if (mergedVersesMap[chapter]) {
+        for (const [start, end] of mergedVersesMap[chapter]) {
+            if (verse >= start && verse <= end) {
+                targetStart = start;
+                targetEnd = end;
+                isMerged = true;
+                break;
+            }
+        }
+    }
+
+    // Find the specific verse, mitigating the bug where merged verse JSON may map `chapter` incorrectly
+    const verseEntry = data.find(v => {
+        if (isMerged) {
+            return v.verse_start === targetStart && v.verse_end === targetEnd && (v.chapter === chapter || v.chapter === targetStart);
+        }
+        return v.chapter === chapter && v.verse_start <= verse && v.verse_end >= verse;
+    });
+
+
 
     if (!verseEntry) return null;
 
     // Transform the local JSON structure to match the API structure
     return {
-        chapter_number: verseEntry.chapter,
-        verse_number: verse, // Using requested verse, even if it's part of a merged block
+        chapter_number: chapter,
+        verse_number: isMerged ? `${targetStart}-${targetEnd}` : verse, // Show merged group
         text: verseEntry.devanagari ? verseEntry.devanagari.replace(/\n+$/g, '').replace(/\n/g, '<br/>') : '', // Sanskrit
         translations: [
             {},{}, 
