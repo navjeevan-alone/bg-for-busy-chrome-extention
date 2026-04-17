@@ -9,12 +9,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Load saved verses
-    chrome.storage.sync.get(['favorites'], (result) => {
+    chrome.storage.sync.get(['favorites'], async (result) => {
         const favorites = result.favorites || [];
         const savedVersesList = document.getElementById('savedVersesList');
         
         if (favorites.length === 0) {
             savedVersesList.innerHTML = '<p class="no-favorites">No saved verses yet</p>';
+            return;
+        }
+
+        let gitaData = [];
+        try {
+            const response = await fetch('./data/bhagavad_gita_unified.json');
+            gitaData = await response.json();
+        } catch (err) {
+            console.error("Error loading gita data:", err);
+            savedVersesList.innerHTML = '<p class="no-favorites">Failed to load verses data</p>';
             return;
         }
 
@@ -39,27 +49,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             savedVersesList.appendChild(verseCard);
 
-            // Load verse content
-            fetch(
-                `https://bhagavad-gita3.p.rapidapi.com/v2/chapters/${fav.chapter}/verses/${fav.verse}/`,
-                {
-                    method: "GET",
-                    headers: {
-                        "X-RapidAPI-Key": "9892626e54msh5fda951b290e0c2p1e343fjsn1291936e2614",
-                        "X-RapidAPI-Host": "bhagavad-gita3.p.rapidapi.com",
-                    },
-                }
-            )
-            .then(response => response.json())
-            .then(data => {
+            // Find verse in local JSON data
+            const chapter = parseInt(fav.chapter);
+            const verse = parseInt(fav.verse);
+            const verseEntry = gitaData.find((v) => v.chapter === chapter && v.verse_start <= verse && v.verse_end >= verse);
+
+            if (verseEntry) {
+                const text = verseEntry.devanagari ? verseEntry.devanagari.replace(/\n+$/g, '').replace(/\n/g, '<br/>') : '';
+                const translation = verseEntry.translation || '';
                 verseCard.querySelector('.verse-content').innerHTML = `
-                    <div class="sanskrit-text">${data.text}</div>
-                    <div class="translation">${data.translations[2].description}</div>
+                    <div class="sanskrit-text">${text}</div>
+                    <div class="translation">${translation}</div>
                 `;
-            })
-            .catch(err => {
+            } else {
                 verseCard.querySelector('.verse-content').innerHTML = 'Failed to load verse';
-            });
+            }
 
             // Add remove button handler
             verseCard.querySelector('.remove-button').addEventListener('click', () => {

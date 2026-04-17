@@ -1,3 +1,16 @@
+/**
+ * script2.js
+ * Handles fetching data from a local JSON file (data/bhagavad_gita_unified.json) and updating the UI.
+ * 
+ * Functions:
+ * - showRandomVerse()
+ * - showNextVerse()
+ * - showPreviousVerse()
+ * - updateUIWithAnimation()
+ * - updateFavoritesList()
+ * - getVerseData()
+ */
+
 const bhagavadGitaChapters = [
   { chapter: 1, verses: 47 },
   { chapter: 2, verses: 72 },
@@ -19,13 +32,57 @@ const bhagavadGitaChapters = [
   { chapter: 18, verses: 78 },
 ];
 
-const options = {
-  method: "GET",
-  headers: {
-    "X-RapidAPI-Key": "9892626e54msh5fda951b290e0c2p1e343fjsn1291936e2614",
-    "X-RapidAPI-Host": "bhagavad-gita3.p.rapidapi.com",
-  },
-};
+let gitaData = null;
+
+/**
+ * Fetches the entire JSON data from the local file
+ * @returns {Promise<Array>} The parsed JSON data
+ */
+async function loadGitaData() {
+  if (gitaData) return gitaData;
+  try {
+    const response = await fetch('./data/bhagavad_gita_unified.json');
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    gitaData = await response.json();
+    return gitaData;
+  } catch (error) {
+     console.error("Error loading JSON data:", error);
+     throw error;
+  }
+}
+
+/**
+ * Gets specific verse data from the loaded JSON
+ * @param {number|string} chapterNumber - Chapter number
+ * @param {number|string} verseNumber - Verse number
+ * @returns {Object|null} Formatted verse data or null if not found
+ */
+async function getVerseData(chapterNumber, verseNumber) {
+    const data = await loadGitaData();
+    const chapter = parseInt(chapterNumber);
+    const verse = parseInt(verseNumber);
+
+    // Find the specific verse
+    const verseEntry = data.find(v => v.chapter === chapter && v.verse_start <= verse && v.verse_end >= verse);
+
+    if (!verseEntry) return null;
+
+    // Transform the local JSON structure to match the API structure
+    return {
+        chapter_number: verseEntry.chapter,
+        verse_number: verse, // Using requested verse, even if it's part of a merged block
+        text: verseEntry.devanagari ? verseEntry.devanagari.replace(/\n+$/g, '').replace(/\n/g, '<br/>') : '', // Sanskrit
+        translations: [
+            {},{}, 
+            { description: verseEntry.translation } // API translation is usually at index 2
+        ],
+        transliteration: verseEntry.verse_text ? verseEntry.verse_text.replace(/\n+$/g, '').replace(/\n/g, '<br/>') : '', // Roman transliteration
+        word_meanings: verseEntry.synonyms
+    };
+}
+
 
 const chapterSelect = document.getElementById("chapter");
 const verseSelect = document.getElementById("verse");
@@ -47,51 +104,30 @@ chapterSelect.addEventListener("change", () => {
 
 const form = document.getElementById("form");
 
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const chapterNumber = chapterSelect.value;
   const verseNumber = verseSelect.value;
-  const resultContainer = document.getElementById("result");
-  const meaningContainer = document.getElementById("meaning");
-  const currentChapterContainer = document.getElementById("currentChapter");
-  const currentVerseContainer = document.getElementById("currentVerse");
-  const speakButton = document.getElementById("speakButton");
-  const whichVerse = document.getElementById("whichVerse");
-  const nextVerse = document.getElementById("nextButton");
 
-  fetch(
-    `https://bhagavad-gita3.p.rapidapi.com/v2/chapters/${chapterNumber}/verses/${verseNumber}/`,
-    options
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  try {
+      const data = await getVerseData(chapterNumber, verseNumber);
+      if (data) {
+          updateUIWithAnimation(data, 'top');
+      } else {
+           throw new Error("Verse not found");
       }
-      return response.json();
-    })
-    .then((data) => {
-      updateUIWithAnimation(data, 'top');
-    })
-    .catch((err) => {
+  } catch (err) {
       console.error("Error fetching verse:", err);
       // Show error message to user
       const resultContainer = document.getElementById("result");
       resultContainer.innerHTML =
         "Sorry, couldn't load the verse. Please try again.";
       resultContainer.style.color = "red";
-    });
+  }
 });
 
 //for random verse in random chapter
-function showRandomVerse() {
-  const resultContainer = document.getElementById("result");
-  const meaningContainer = document.getElementById("meaning");
-  const whichVerse = document.getElementById("whichVerse");
-  const currentChapterContainer = document.getElementById("currentChapter");
-  const currentVerseContainer = document.getElementById("currentVerse");
-  const speakButton = document.getElementById("speakButton");
-  const nextVerse = document.getElementById("nextButton");
-
+async function showRandomVerse() {
   const maxChapters = 18;
   const maxVerses = [
     47, 72, 43, 42, 29, 47, 30, 28, 34, 42, 55, 20, 35, 27, 20, 24, 28, 78,
@@ -115,40 +151,32 @@ function showRandomVerse() {
   // Set the verse select value
   verseSelect.value = randomVerseNumber;
 
-  fetch(
-    `https://bhagavad-gita3.p.rapidapi.com/v2/chapters/${randomChapterNumber}/verses/${randomVerseNumber}/`,
-    options
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  try {
+      const data = await getVerseData(randomChapterNumber, randomVerseNumber);
+      if(data){
+          updateUIWithAnimation(data, 'top');
+      } else {
+          throw new Error("Verse not found");
       }
-      return response.json();
-    })
-    .then((data) => {
-      updateUIWithAnimation(data, 'top');
-    })
-    .catch((err) => {
+  } catch (err) {
       console.error("Error fetching verse:", err);
       // Show error message to user
       const resultContainer = document.getElementById("result");
       resultContainer.innerHTML =
         "Sorry, couldn't load the verse. Please try again.";
       resultContainer.style.color = "red";
-    });
+  }
 }
 
 const randomForm = document.getElementById("randomForm");
 
 randomForm.addEventListener("submit", (e) => {
   e.preventDefault();
-
   showRandomVerse();
 });
 
 // latest for showing next verse
-
-function showNextVerse() {
+async function showNextVerse() {
   const chapterNumber = chapterSelect.value;
   let verseNumber = parseInt(verseSelect.value);
   if (verseNumber < bhagavadGitaChapters[chapterNumber - 1].verses) {
@@ -182,32 +210,25 @@ function showNextVerse() {
     }
   }
 
-  // Fetch the verse directly instead of using form submission
-  fetch(
-    `https://bhagavad-gita3.p.rapidapi.com/v2/chapters/${chapterSelect.value}/verses/${verseSelect.value}/`,
-    options
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  try {
+      const data = await getVerseData(chapterSelect.value, verseSelect.value);
+      if(data){
+          updateUIWithAnimation(data, 'right');
+      } else {
+          throw new Error("Verse not found");
       }
-      return response.json();
-    })
-    .then((data) => {
-      updateUIWithAnimation(data, 'right');
-    })
-    .catch((err) => {
+  } catch (err) {
       console.error("Error fetching verse:", err);
       const resultContainer = document.getElementById("result");
       resultContainer.innerHTML = "Sorry, couldn't load the verse. Please try again.";
       resultContainer.style.color = "red";
-    });
+  }
 }
 
 document.getElementById("nextButton").addEventListener("click", showNextVerse);
 
 //to show previous verse
-function showPreviousVerse() {
+async function showPreviousVerse() {
   const chapterNumber = chapterSelect.value;
   let verseNumber = parseInt(verseSelect.value);
   if (verseNumber > 1) {
@@ -250,26 +271,19 @@ function showPreviousVerse() {
     }
   }
 
-  // Fetch the verse directly instead of using form submission
-  fetch(
-    `https://bhagavad-gita3.p.rapidapi.com/v2/chapters/${chapterSelect.value}/verses/${verseSelect.value}/`,
-    options
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  try {
+      const data = await getVerseData(chapterSelect.value, verseSelect.value);
+      if(data) {
+          updateUIWithAnimation(data, 'left');
+      } else {
+          throw new Error("Verse not found");
       }
-      return response.json();
-    })
-    .then((data) => {
-      updateUIWithAnimation(data, 'left');
-    })
-    .catch((err) => {
+  } catch (err) {
       console.error("Error fetching verse:", err);
       const resultContainer = document.getElementById("result");
       resultContainer.innerHTML = "Sorry, couldn't load the verse. Please try again.";
       resultContainer.style.color = "red";
-    });
+  }
 }
 
 document
@@ -288,15 +302,18 @@ function updateUIWithAnimation(data, direction = 'top') {
   const navButtons = document.querySelector(".nav-buttons");
 
   // Process word meanings to make Sanskrit terms bold and add spaces after semicolons
-  const formattedWordMeanings = data.word_meanings.split(';')
-    .map(part => {
-      const [term, ...meaning] = part.split('—');
-      if (meaning.length > 0) {
-        return `<strong>${term.trim()}</strong>—${meaning.join('—')}`;
-      }
-      return part;
-    })
-    .join('; ');
+  let formattedWordMeanings = "";
+  if (data.word_meanings) {
+      formattedWordMeanings = data.word_meanings.split(';')
+        .map(part => {
+          const [term, ...meaning] = part.split('—');
+          if (meaning.length > 0) {
+            return `<strong>${term.trim()}</strong>—${meaning.join('—')}`;
+          }
+          return part;
+        })
+        .join('; ');
+  }
 
   // Update content with formatted word meanings
   resultContainer.innerHTML = data.text;
@@ -359,7 +376,7 @@ function updateUIWithAnimation(data, direction = 'top') {
   // Add new event listener
   newSpeakButton.addEventListener("click", () => {
     chrome.tts.speak(data.text, {
-      lang: "sa",
+      lang: "sa", // Note: The old text had Sanskrit but Chrome might not support 'sa' flawlessly everywhere
       rate: 1.0,
       pitch: 1.0
     });
