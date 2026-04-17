@@ -125,27 +125,11 @@ async function getVerseData(chapterNumber, verseNumber) {
 const chapterSelect = document.getElementById("chapter");
 const verseSelect = document.getElementById("verse");
 
-chapterSelect.addEventListener("change", () => {
-  const chapterNumber = parseInt(chapterSelect.value);
-  if (chapterNumber) {
-    // Clear existing options
-    verseSelect.innerHTML = "";
-    // Add option for each verse in selected chapter
-    for (let i = 1; i <= bhagavadGitaChapters[chapterNumber - 1].verses; i++) {
-      const option = document.createElement("option");
-      option.text = "Verse " + i;
-      option.value = i;
-      verseSelect.add(option);
-    }
-  }
-});
-
-const form = document.getElementById("form");
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+async function fetchAndDisplayVerse() {
   const chapterNumber = chapterSelect.value;
   const verseNumber = verseSelect.value;
+  
+  if (!chapterNumber || chapterNumber === "none" || !verseNumber || verseNumber === "none") return;
 
   try {
       const data = await getVerseData(chapterNumber, verseNumber);
@@ -162,6 +146,31 @@ form.addEventListener("submit", async (e) => {
         "Sorry, couldn't load the verse. Please try again.";
       resultContainer.style.color = "red";
   }
+}
+
+chapterSelect.addEventListener("change", () => {
+  const chapterNumber = parseInt(chapterSelect.value);
+  if (chapterNumber) {
+    // Clear existing options
+    verseSelect.innerHTML = "";
+    // Add option for each verse in selected chapter
+    for (let i = 1; i <= bhagavadGitaChapters[chapterNumber - 1].verses; i++) {
+      const option = document.createElement("option");
+      option.text = "Verse " + i;
+      option.value = i;
+      verseSelect.add(option);
+    }
+    
+    // Auto-fetch the first verse of the newly selected chapter
+    fetchAndDisplayVerse();
+  }
+});
+
+verseSelect.addEventListener("change", fetchAndDisplayVerse);
+
+const form = document.getElementById("form");
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
 });
 
 //for random verse in random chapter
@@ -338,6 +347,8 @@ function updateUIWithAnimation(data, direction = 'top') {
   const whichVerse = document.getElementById("whichVerse");
   const speakButton = document.getElementById("speakButton");
   const navButtons = document.querySelector(".nav-buttons");
+  const vedabaseLinkContainer = document.getElementById("vedabase_link_container");
+  const vedabaseLink = document.getElementById("vedabaseLink");
 
   // Process word meanings to make Sanskrit terms bold and add spaces after semicolons
   let formattedWordMeanings = "";
@@ -364,6 +375,8 @@ function updateUIWithAnimation(data, direction = 'top') {
   currentChapterContainer.innerHTML = data.chapter_number;
   currentVerseContainer.innerHTML = data.verse_number;
 
+  vedabaseLink.href = `https://vedabase.io/en/library/bg/${data.chapter_number}/${data.verse_number}/`;
+
   // Make elements visible first
   resultContainer.style.display = 'block';
   meaningContainer.style.display = 'block';
@@ -372,6 +385,7 @@ function updateUIWithAnimation(data, direction = 'top') {
   whichVerse.style.display = 'block';
   speakButton.style.display = 'block';
   navButtons.style.display = 'flex';
+  vedabaseLinkContainer.style.display = 'block';
 
   // Remove existing animation classes
   const elements = [
@@ -380,7 +394,8 @@ function updateUIWithAnimation(data, direction = 'top') {
     transliterationContainer,
     wordMeaningsContainer,
     whichVerse, 
-    speakButton
+    speakButton,
+    vedabaseLinkContainer
   ];
   elements.forEach(el => {
     if (el) {
