@@ -117,7 +117,8 @@ async function getVerseData(chapterNumber, verseNumber) {
             { description: verseEntry.translation } // API translation is usually at index 2
         ],
         transliteration: verseEntry.verse_text ? verseEntry.verse_text.replace(/\n+$/g, '').replace(/\n/g, '<br/>') : '', // Roman transliteration
-        word_meanings: verseEntry.synonyms
+        word_meanings: verseEntry.synonyms,
+        purport: verseEntry.purport
     };
 }
 
@@ -340,6 +341,7 @@ document
 function updateUIWithAnimation(data, direction = 'top') {
   const resultContainer = document.getElementById("result");
   const meaningContainer = document.getElementById("meaning");
+  const purportContainer = document.getElementById("purport");
   const transliterationContainer = document.getElementById("transliteration");
   const wordMeaningsContainer = document.getElementById("word_meanings");
   const currentChapterContainer = document.getElementById("currentChapter");
@@ -368,6 +370,8 @@ function updateUIWithAnimation(data, direction = 'top') {
   resultContainer.innerHTML = data.text;
   meaningContainer.innerHTML = data.translations[2].description;
   meaningContainer.setAttribute('data-title', 'Translation:');
+  purportContainer.innerHTML = data.purport ? data.purport.replace(/\n/g, '<br/>') : '';
+  purportContainer.setAttribute('data-title', 'Purport:');
   transliterationContainer.innerHTML = data.transliteration;
   transliterationContainer.setAttribute('data-title', 'Transliteration:');
   wordMeaningsContainer.innerHTML = formattedWordMeanings;
@@ -380,6 +384,7 @@ function updateUIWithAnimation(data, direction = 'top') {
   // Make elements visible first
   resultContainer.style.display = 'block';
   meaningContainer.style.display = 'block';
+  purportContainer.style.display = data.purport ? 'block' : 'none';
   transliterationContainer.style.display = 'block';
   wordMeaningsContainer.style.display = 'block';
   whichVerse.style.display = 'block';
@@ -391,6 +396,7 @@ function updateUIWithAnimation(data, direction = 'top') {
   const elements = [
     resultContainer, 
     meaningContainer, 
+    purportContainer,
     transliterationContainer,
     wordMeaningsContainer,
     whichVerse, 
@@ -428,8 +434,9 @@ function updateUIWithAnimation(data, direction = 'top') {
 
   // Add new event listener
   newSpeakButton.addEventListener("click", () => {
-    chrome.tts.speak(data.text, {
-      lang: "sa", // Note: The old text had Sanskrit but Chrome might not support 'sa' flawlessly everywhere
+    const textToRead = `${data.translations[2].description}. ${data.purport || ''}`;
+    chrome.tts.speak(textToRead, {
+      lang: "en-US",
       rate: 1.0,
       pitch: 1.0
     });
